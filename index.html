@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Learn Skyle by Example</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="google-site-verification" content="zrJvcjR2Q-R1sqf53o-wdgOBMAXeC8N46IC5xZY94rk" />
+        <meta name="description" content="Skyle is a various file format scraper with its own declarative language">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+        <link href="https://fonts.googleapis.com/css?family=Ubuntu|VT323" rel="stylesheet">
+        <style type="text/css">
+            @media (max-width: 425px) {
+                #stack {
+                    display: none !important;
+                }
+                #sample {
+                    padding: 30px 3px !important;
+                }
+                #sample ol {
+                    font-size: 13px !important;
+                }
+            }
+            @keyframes pop {
+                0% {
+                    opacity: 0;
+                    transform: scale(.1);
+                    filter: blur(1px);
+                }
+                50% {
+                    opacity: 1;
+                    transform: scale(.1) rotate(3deg);
+                    filter: blur(1px);
+                }
+                90% {
+                    opacity: 1;
+                    transform: scale(1.1) rotate(-2deg);
+                    filter: blur(1px);
+                }
+                100% {
+                    opacity: 1;
+                    transform: scale(1) rotate(0);
+                    filter: blur(0);
+                }
+            }
+            @keyframes goup {
+                0% {
+                    top: 200%;
+                    transform: scale(2);
+                    background-color: #0f1f2b;
+                }
+                70% {
+                    top: 0;
+                    transform: scale(.5);
+                    background-color: #0f1f2b;
+                }
+                100% {
+                    top: 0;
+                    transform: scale(1);
+                }
+            }
+            @keyframes goupback {
+                0% {
+                    top: 0;
+                }
+                30% {
+                    top: -10%;
+                }
+                100% {
+                    top: 200%;
+                }
+            }
+            @keyframes reveal {
+                0% {
+                    opacity: 0;
+                }
+                50% {
+                    opacity: 0;
+                }
+                100% {
+                    opacity: 1;
+                }
+            }
+            @keyframes intro {
+                0% {
+                    top: -250px;
+                }
+                50% {
+                    top: -250px;
+                }
+                100% {
+                    top: 0;
+                }
+            }
+            @keyframes left2right {
+                0% {
+                    transform: perspective(400px) rotateY(-15deg) rotateX(-10deg);
+                }
+                20% {
+                    transform: perspective(400px) rotateY(-10deg) rotateX(-10deg);
+                }
+                100% {
+                    transform: perspective(400px) rotateY(15deg) rotateX(10deg);
+                }
+            }
+            @keyframes right2left {
+                0% {
+                    transform: perspective(400px) rotateY(15deg) rotateX(10deg);
+                }
+                20% {
+                    transform: perspective(400px) rotateY(10deg) rotateX(10deg);
+                }
+                100% {
+                    transform: perspective(400px) rotateY(-15deg) rotateX(-10deg);
+                }
+            }
+            * {
+                transition: all .9s;
+            }
+            body {
+                background: #fbfbfb;
+            }
+            div.main {
+                margin-top: 30px;
+                animation: reveal 1.5s;
+                user-select: none;
+            }
+            div.main h2 {
+                margin-bottom: 20px;
+            }
+            div.main p {
+                text-align: justify;
+            }
+            div#sample {
+                margin: 0 auto;
+                padding: 30px 20px;
+                background: #212d41;
+                border-bottom: 10px solid #0e1d29;
+                position: relative;
+                animation: intro 1s;
+                border-radius: 0 0 3px 3px;
+                box-shadow: 0 0 20px #212d41;
+            }
+            ol.skyle {
+                color: #676588;
+                font-family: monospace;
+                font-size: 15px;
+                position: relative;
+                animation: intro .99s;
+            }
+            ol.skyle span.comment {
+                color: #999;
+            }
+            ol.skyle span.headers {
+                color: #a8a6e2;
+            }
+            ol.skyle span.headers i {
+                color: #f1c489;
+                font-style: normal;
+            }
+            ol.skyle span.functions {
+                color: #a8a6e2;
+            }
+            ol.skyle span.functions i {
+                font-style: normal;
+            }
+            ol.skyle span.functions i.save {
+                color: #ff9a9a;
+            }
+            ol.skyle span.functions i.next,
+            ol.skyle span.functions i.node,
+            ol.skyle span.functions i.flush,
+            ol.skyle span.functions i.follow {
+                color: #e0e0e0;
+            }
+            ol.skyle span.functions i.keep {
+                color: #92d2ca;
+            }
+            ol.skyle span.functions i.remove,
+            ol.skyle span.functions i.pattern {
+                color: #92d2ca;
+            }
+            ol.skyle span.functions i.exec {
+                color: #98c379;
+            }
+            div#sample h1 {
+                position: absolute;
+                bottom: -35px;
+                right: 35px;
+                font-family: 'VT323', monospace;
+                font-weight: 400;
+                font-size: 56px;
+                margin: 0;
+                padding: 10px;
+                background: #0e1d29;
+                color: #97979a;
+                display: inline-block;
+                user-select: none;
+                border-radius: 3px;
+            }
+            div#sample h1:before {
+                content: '>';
+                display: inline-block;
+            }
+            div#sample div.badge {
+                display: block;
+                position: absolute;
+                width: 154px;
+                height: 24px;
+                bottom: -33px;
+                right: 35px;
+                box-shadow: 0 0 20px #212d41;
+                z-index: -1;
+            }
+            strong {
+                font-weight: 400;
+            }
+            div.profile-header {
+                background: #0f1e2a;
+                font-size: 12px;
+                color: #979799;
+                padding: 5px;
+                border-radius: 5px 5px 0 0;
+                text-transform: uppercase;
+                box-shadow: 0 225px 20px rgba(33, 45, 65, 0.3);
+            }
+            div.profile-header i,
+            div.profile-header b {
+                display: inline-block;
+                background: #ff4242;
+                width: 9px;
+                height: 9px;
+                border-radius: 50px;
+            }
+            div.profile-header i {
+                background: #ffff4d;
+            }
+            div#profile {
+                background: #212e41;
+                width: 180px;
+                border-radius: 3px;
+                padding: 0;
+                margin: 0 auto;
+            }
+            div#profile span {
+                display: block;
+                width: 100px;
+                height: 3px;
+                border-radius: 1px;
+                margin: 5px 10px;
+                background: #374963;
+                transition: all .5s;
+            }
+            div#profile.headers span.header {
+                background: #ffb06e;
+            }
+            div#profile.instructions span.follow {
+                background: #eaeaea;
+            }
+            div#profile.instructions span.save {
+                background: #ff9a9a;
+            }
+            div#profile.instructions span.keep,
+            div#profile.instructions span.pattern,
+            div#profile.instructions span.replace,
+            div#profile.instructions span.remove {
+                background: #92d2ca;
+            }
+            div#profile.instructions span.glue {
+                background: #dfea84;
+            }
+            div#profile.headers {
+                animation: right2left ease-out 1.5s;
+                transform: perspective(400px) rotateY(-15deg) rotateX(-10deg);
+            }
+            div#profile.instructions {
+                animation: left2right ease-out 1.5s;
+                transform: perspective(400px) rotateY(15deg) rotateX(10deg);
+            }
+            div.case {
+                background: #212e41;
+                border-radius: 3px;
+            }
+            div.case ol {
+                padding: 20px 50px;
+            }
+            div.case ol li.active,
+            div.case ol li:hover {
+                background: #2e3c52;
+                cursor: pointer;
+                border-radius: 3px;
+            }
+            ul.stack {
+                margin: 0;
+                padding: 0;
+            }
+            ul.stack li {
+                display: inline-block;
+                margin: 0 1px;
+                padding: 0;
+                background: #212e41;
+                width: 15px;
+                height: 15px;
+                border-radius: 3px;
+            }
+            ul.stack li.active {
+                background: #9fe883;
+            }
+            ul.stack li.disabled {
+                opacity: .3;
+            }
+            ul.stack:after,
+            ul.stack:before {
+                content: "";
+                display: inline-block;
+                background: none;
+                border: 1px solid #999;
+                border-radius: 0;
+                width: 2px;
+                height: 20px;
+                position: relative;
+                top: 2px;
+            }
+            ul.stack:before {
+                border-right: 0;
+            }
+            ul.stack:after {
+                border-left: 0;
+            }
+            div#stack:before {
+                content: "";
+                display: block;
+                position: absolute;
+                top: 18px;
+                left: -20px;
+                width: 0;
+                height: 0;
+                border-top: 15px solid transparent;
+                border-bottom: 15px solid transparent;
+                border-right: 25px solid #0f1e2a;
+            }
+            div#stack span {
+                font-size: 12px;
+                text-transform: uppercase;
+                text-align: center;
+                color: #9fe883;
+            }
+            div#stack {
+                background: #0f1e2a;
+                width: 185px;
+                padding: 10px 20px;
+                border-radius: 3px;
+                position: absolute;
+                top: 94px;
+                left: 285px;
+                box-shadow: 0 0 20px #0f1f2b;
+                animation: reveal 1.8s;
+                z-index: 1;
+            }
+            div#stack p {
+                margin: 0;
+                padding: 0;
+                font-size: 13px;
+                color: #eee;
+                text-align: left;
+            }
+            [data-profile="headers"] p {
+                padding-right: 25px;
+                border-right: 2px solid #9fafc7;
+            }
+            [data-profile="instructions"] p {
+                padding-left: 25px;
+                border-left: 2px solid #9fafc7;
+            }
+            [data-profile] p {
+                color: #4d5761;
+                font-size: .9rem;
+                opacity: .5;
+                cursor: pointer;
+            }
+            [data-profile] p b {
+                color: #212529;
+                font-size: 1rem;
+            }
+            [data-profile] p.active {
+                opacity: 1;
+            }
+            pre.terminal {
+                background: #efefef;
+                border-radius: 3px;
+                padding: 30px 10px;
+                cursor: text;
+                user-select: text;
+            }
+            u.tty {
+                text-decoration: none;
+                font-family: monospace;
+                background: #efeff0;
+                padding: 5px;
+                border-radius: 3px;
+            }
+            div.output {
+                background: #f7f7f7;
+                border-radius: 3px;
+            }
+            div.output div.profile-header {
+                background: #d1dde6;
+                color: #74899a;
+                box-shadow: none;
+            }
+            div.output table {
+                width: 100%;
+                font-family: monospace;
+                font-size: 15px;
+            }
+            div.output table td {
+                border: 1px solid #e6e6e6;
+                padding: 5px;
+                position: relative;
+            }
+            div.output table td[data-table="header"] {
+                background: #f3f3f3;
+                font-size: 10px;
+                text-align: center;
+                color: #999;
+            }
+            div.output table td.active {
+                border: 2px solid #333;
+            }
+            div.output table td.active:after {
+                content: "";
+                display: block;
+                position: absolute;
+                width: 8px;
+                height: 8px;
+                background: #333;
+                right: -4px;
+                bottom: -4px;
+            }
+            div.terminal {
+                background: #f5f5f5;
+                border-radius: 3px 3px 0 0;
+                overflow: hidden;
+            }
+            div.terminal div.profile-header {
+                background: #ececec;
+                color: #b3b3b3;
+                box-shadow: none;
+            }
+            div.terminal div.profile-header b {
+                background: #ffc9c9;
+            }
+            div.terminal div.profile-header i {
+                background: #ffffcd;
+            }
+            div.terminal pre {
+                margin: 0;
+                padding: 20px 10px 0 10px;
+                color: #bdbdbd;
+                position: relative;
+                top: 10px;
+            }
+            div.github {
+                margin: 40px 0 80px;
+            }
+            div.github p {
+                text-align: center;
+            }
+            kbd {
+                cursor: pointer;
+            }
+            body > .container.blur {
+                filter: blur(2px);
+                transition: filter .3s;
+            }
+            body > aside {
+                position: absolute;
+                display: block;
+                z-index: 1;
+                background: #0f1e2a;
+                color: #eee;
+                padding: 0;
+                margin: 0;
+                border-radius: 3px;
+                font-size: 12px;
+                font-family: monospace;
+                width: 200px;
+                animation: pop .5s;
+                cursor: pointer;
+            }
+            body > aside b {
+                display: block;
+                font-weight: 400;
+                font-style: normal;
+                padding: 5px 10px;
+                color: #8c8e90;
+            }
+            body > aside i {
+                display: block;
+                background: #212e41;
+                border-radius: 3px 3px 0 0;
+                border-bottom: 1px solid #060c10;
+                padding: 5px 10px;
+            }
+            div.support.show {
+                animation: goup .5s;
+            }
+            div.support.hide {
+                animation: goupback .5s;
+            }
+            div.support {
+                background: #212e41 !important;
+                color: #a8a6e2;
+                width: 100%;
+                height: 100%;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                display: none;
+            }
+            div.support article {
+                border-left: 5px solid #a8a6e2;
+                font-family: monospace;
+                width: 400px;
+                margin: 0 auto;
+                padding: 20px;
+                color: #d9d9e8;
+                cursor: default;
+                user-select: none;
+            }
+            div.support article p:last-child {
+                color: #6e85ab;
+            }
+            [id^="case"] ol li {
+                cursor: text !important;
+                user-select: text !important;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="row">
+                <div class="col-xl-10 offset-xl-1 col-md-12">
+                    <div id="sample">
+                        <ol class="skyle">
+                            <li><span class="comment">#!/usr/bin/skyle</span></li>
+                            <li></li>
+                            <li><span class="comment"># getting started in less than 5 minutes</span></li>
+                            <li><span class="headers">title <i>tutorial</i></span></li>
+                            <li><span class="headers">probe <i>http://skyle.codeissues.net/</i></span></li>
+                            <li><span class="headers">output <i>keywords.csv</i></span></li>
+                            <li></li>
+                            <li><span class="comment"># extract all Skyle keywords</span></li>
+                            <li><span class="functions">follow <i class="follow">//table//kbd/text()</i></span></li>
+                            <li><span class="functions">save <i class="save">keyword</i></span></li>
+                            <li></li>
+                            <li><span class="comment"># add keyword usage example</span></li>
+                            <li><span class="functions">follow <i class="follow">//table//kbd/@data-usage</i></span></li>
+                            <li><span class="functions">save <i class="save">usage</i></span></li>
+                        </ol>
+                        <div class="badge"></div>
+                        <h1>Skyle</h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container main">
+            <div class="row">
+                <div class="col-xl-8 offset-xl-2 col-lg-10 offset-lg-1 col-md-12">
+                    <h2>Learn Skyle by Example</h2>
+                    <p><strong>Skyle</strong> is an ambitious open-source scraper with its own declarative language. It's purpose is to create a portable and elegant way to scrape various file formats. The following document is a brief introduction on how <strong>Skyle</strong> can be used. A good understanding of regular expressions and XPath expressions is important.</p>
+                    <p>&nbsp;</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xl-8 offset-xl-2 col-lg-10 offset-lg-1 col-md-12">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="row" data-profile="headers">
+                                <div class="col-md-12">
+                                    <p class="text-right active">
+                                        <b>Headers</b><br>user-defined constants at the begining, static properties of the profile, global settings
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    &nbsp;
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div id="profile" class="headers">
+                                <div class="profile-header">
+                                    <b></b>
+                                    <i></i>
+                                    Skyle profile
+                                </div>
+                                <span style="width: 20%;"></span>
+                                <span style="width: 0%;"></span>
+                                <span class="header" style="width: 30%;"></span>
+                                <span class="header" style="width: 42%;"></span>
+                                <span class="header" style="width: 80%;"></span>
+                                <span class="header" style="width: 40%;"></span>
+                                <span class="header" style="width: 20%;"></span>
+                                <span class="header" style="width: 70%;"></span>
+                                <span class="header" style="width: 60%;"></span>
+                                <span style="width: 0%;"></span>
+                                <span style="width: 0%;"></span>
+                                <span class="follow" style="width: 55%;"></span>
+                                <span class="pattern" style="width: 49%;"></span>
+                                <span class="replace" style="width: 90%;"></span>
+                                <span class="save" style="width: 20%;"></span>
+                                <span style="width: 0%;"></span>
+                                <span style="width: 0%;"></span>
+                                <span class="follow" style="width: 80%;"></span>
+                                <span class="remove" style="width: 75%;"></span>
+                                <span class="keep" style="width: 70%;"></span>
+                                <span class="glue" style="width: 60%;"></span>
+                                <span class="save" style="width: 25%;"></span>
+                                <span style="width: 0%;"></span>
+                                <span style="width: 0%;"></span>
+                            </div>
+                            <div id="shadow"></div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <br><br><br><br><br>
+                                </div>
+                            </div>
+                            <div class="row" data-profile="instructions">
+                                <div class="col-md-12">
+                                    <p class="text-left">
+                                        <b>Instructions</b><br>blocks of code, text modifiers, filtering expressions, save query results
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xl-8 offset-xl-2 col-lg-10 offset-lg-1 col-md-12">
+                    <p>&nbsp;</p>
+                    <p>A file written in <strong>Skyle</strong> is called a profile. It is case-sensitive and whitespace sensitive. A profile is divided into headers and instructions. Headers must precede instructions, otherwise an error is thrown and exits. </p>
+                    <p>The goal of a <strong>Skyle</strong> profile is to describe the steps to scrape a <kbd data-def="Provide the file path or URI to desired probe" data-usage="probe RESOURCE">probe</kbd> through instructions. The results are saved in an <kbd data-def="Provide the file path for output file" data-usage="output FILENAME">output</kbd>. These are the most common two headers of a profile.</p>
+                    <p>Think of headers as some very barebone assumptions of a certain task, whereas the instructions are basically the blueprints of the solution. Another point to remember is that instructions are file format dependent, whereas headers are not.</p>
+                    <p><strong>Skyle</strong> uses an in-memory stack after the <kbd data-def="Provide the file path or URI to desired probe" data-usage="probe RESOURCE">probe</kbd> has been successfully loaded. This stack adapts after each instruction, meaning an instruction will indirectly change the stack's elements. The table below lists three instructions that directly interacts with the stack.</p>
+                    <table class="table">
+                        <tr>
+                            <th>Instruction</th>
+                            <th>Usage</th>
+                        </tr>
+                        <tr>
+                            <td>
+                                <kbd data-def="Prints the memory stack at the current calltime" data-usage="dump MESSAGE">dump</kbd>
+                            </td>
+                            <td>Used to analyze the stack</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <kbd data-def="Resets memory stack with initial values" data-usage="flush all">flush</kbd>
+                            </td>
+                            <td>Revert the stack to its initial state</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <kbd data-def="Save current stack as result for output" data-usage="save VARIABLE [VALUE]">save</kbd>
+                            </td>
+                            <td><em>Label</em> results for output</td>
+                        </tr>
+                    </table>
+                    <p>By design, <strong>Skyle</strong> handles saved entities as lists. Having this in mind, one entity is not a value; it is a list with one element. This applies for nil values as well; there are no nil values, just lists with zero elements.</p>
+                    <p>Whenever <strong>Skyle</strong> encounters the <kbd data-def="Save current stack as result for output" data-usage="save VARIABLE [VALUE]">save</kbd> instruction, it understands that the results are now classified as <em>category</em>, where <em>category</em> is the name after the <kbd data-def="Save current stack as result for output" data-usage="save VARIABLE [VALUE]">save</kbd> instruction. A good synonim for the word <em>save</em> would be <em>label</em>.</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xl-8 offset-xl-2 col-lg-10 offset-lg-1 col-md-12">
+                    <div id="dummy" class="case">
+                        <div class="profile-header">
+                            <b></b>
+                            <i></i>
+                            Skyle profile
+                        </div>
+                        <ol class="skyle">
+                            <li><span class="comment">#!/usr/bin/skyle</span></li>
+                            <li></li>
+                            <li><span class="comment"># provide path to probe</span></li>
+                            <li data-memory="1" data-stack="Skyle initializes the memory stack with the probe's context" class="active"><span class="headers">probe <i>/tmp/dummy.html</i></span></li>
+                            <li></li>
+                            <li><span class="comment"># evaluate xpath expression</span></li>
+                            <li data-memory="6" data-stack="The result of this instruction changes the memory stack with its own results"><span class="functions">follow <i class="follow">//a/@href</i></span></li>
+                            <li></li>
+                            <li><span class="comment"># filter all results from previous</span></li>
+                            <li><span class="comment"># instruction and keep new results</span></li>
+                            <li data-memory="4" data-stack="Filters the results of the previous instruction. Stack is changed once more"><span class="functions">keep <i class="keep">.+\.pdf$</i></span></li>
+                            <li></li>
+                            <li><span class="comment"># label results from previous</span></li>
+                            <li><span class="comment"># instruction and write to output</span></li>
+                            <li data-memory="4" data-stack="Memory stack is not changed, instead results are labeled and passed on for output" data-save="true"><span class="functions">save <i class="save">files</i></span></li>
+                            <li></li>
+                        </ol>
+                    </div>
+                    <div id="stack">
+                        <span>Memory stack dump</span>
+                        <ul class="stack">
+                            <li class="active"></li>
+                            <li></li>
+                            <li></li>
+                            <li></li>
+                            <li></li>
+                            <li></li>
+                        </ul>
+                        <p>Skyle initializes the memory stack with the probe's context</p>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xl-8 offset-xl-2 col-lg-10 offset-lg-1 col-md-12">
+                    <p>As a side note, lines starting with the pound sign (hashtag) are comments and <strong>Skyle</strong> ignores them. Use comments to leave user friendly notes.</p>
+                    <p>Make yourself familiar with some common keywords before moving on with some use-case scenarios and profile examples.</p>
+                    <table class="table">
+                        <tr>
+                            <th>Keyword</th>
+                            <th>Meaning</th>
+                        </tr>
+                        <tr>
+                            <td>
+                                <kbd data-def="Give the profile a name or a description" data-usage="title NAME">title</kbd>
+                                <kbd data-def="Provide the file path or URI to desired probe" data-usage="probe RESOURCE">probe</kbd>
+                                <kbd data-def="Provide the file path for output file" data-usage="output FILENAME">output</kbd>
+                            </td>
+                            <td>Common headers</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <kbd data-def="Profile customization settings" data-usage="flags K[=V] [K[=V]]">flags</kbd>
+                            </td>
+                            <td>Advance header used to customize profile</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <kbd data-def="Evaluates an XPath expression" data-usage="follow XPATH">follow</kbd>
+                                <kbd data-def="Change the ROOT node" data-usage="node XPATH">node</kbd>
+                                <kbd data-def="Loop last declared node" data-usage="next node">next</kbd>
+                            </td>
+                            <td>XML/HTML instructions &amp; loop instruction</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <kbd data-def="Evaluates a regular expression" data-usage="pattern REGEXP">pattern</kbd>
+                                <kbd data-def="Removes recursive regular expression" data-usage="remove REGEXP">remove</kbd>
+                                <kbd data-def="Replaces variables in a given string" data-usage="glue TEXT+$VAR">glue</kbd>
+                            </td>
+                            <td>Text modifier instructions</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <kbd data-def="Filters against a regular expression" data-usage="keep REGEXP">keep</kbd>
+                            </td>
+                            <td>Filter expression instruction</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <kbd data-def="Save current stack as result for output" data-usage="save VARIABLE [VALUE]">save</kbd>
+                            </td>
+                            <td>Save instruction, used for output</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <kbd data-def="Launches a shell command" data-usage="exec SHELL">exec</kbd>
+                            </td>
+                            <td>Shell instruction, used to execute shell commands</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xl-8 offset-xl-2 col-lg-10 offset-lg-1 col-md-12">
+                    <p>A first use-case of a simple profile is to scrape an interview paper with questions and answers and create a tabel-like output of the results. <strong>Skyle</strong> supports CSV with headers as an <kbd data-def="Provide the file path for output file" data-usage="output FILENAME">output</kbd> of the profile.</p>
+                    <pre class="terminal">
+    $ ls
+    interview.txt
+
+    $ cat interview.txt
+    Q: What's your name?
+    A: Skyle.
+
+    Q: How are you?
+    A: I'm fine, thanks.
+
+    Q: What do you think of this interview?
+    A: It's nice!</pre>
+                    <p>This is how the <u class="tty">interview.txt</u> looks like. Each question and answer is written on a line. Questions start with the <u class="tty">Q:</u> prefix and answers with <u class="tty">A:</u> prefix and a blank line separates each pair. This pattern can be used to transform the <kbd data-def="Provide the file path or URI to desired probe" data-usage="probe RESOURCE">probe</kbd> into something else.</p>
+                    <p>The expression for a <em>question</em> line is <u class="tty">Q:\s(What's your name?)\n</u> and the <kbd data-def="Evaluates a regular expression" data-usage="pattern REGEXP">pattern</kbd> can be extracted as <u class="tty">Q:\s+(.*)\n</u>. It's availabe for <em>answers</em> as well. Finally, the profile looks like this.</p>
+                    <div id="case1" class="case">
+                        <div class="profile-header">
+                            <b></b>
+                            <i></i>
+                            Skyle profile
+                        </div>
+                        <ol class="skyle">
+                            <li><span class="comment">#!/usr/bin/skyle</span></li>
+                            <li></li>
+                            <li><span class="comment"># a name for the profile to recognize it later</span></li>
+                            <li><span class="headers">title <i>Interview Example</i></span></li>
+                            <li></li>
+                            <li><span class="comment"># provide path to interview probe</span></li>
+                            <li><span class="headers">probe <i>interview.txt</i></span></li>
+                            <li></li>
+                            <li><span class="comment"># provide path to output</span></li>
+                            <li><span class="headers">output <i>interview.csv</i></span></li>
+                            <li></li>
+                            <li><span class="comment"># get all questions and save them</span></li>
+                            <li><span class="functions">pattern <i class="pattern">Q:\s+(.*)\n</i></span></li>
+                            <li><span class="functions">save <i class="save">question</i></span></li>
+                            <li></li>
+                            <li><span class="comment"># reset the stack</span></li>
+                            <li><span class="functions">flush <i class="flush">all</i></span></li>
+                            <li></li>
+                            <li><span class="comment"># get all answers and save them</span></li>
+                            <li><span class="functions">pattern <i class="pattern">A:\s+(.*)\n</i></span></li>
+                            <li><span class="functions">save <i class="save">answer</i></span></li>
+                            <li></li>
+                        </ol>
+                    </div>
+                    <p>The <kbd data-def="Give the profile a name or a description" data-usage="title NAME">title</kbd> is not mandatory, but it helps organize profiles by adding names or short descriptions per file. Running the profile will generate the desired <kbd data-def="Provide the file path for output file" data-usage="output FILENAME">output</kbd> as follows.</p>
+                    <pre class="terminal">
+    $ stat -c "%A %n" *
+    -rw-rw-r-- interview.txt
+    -rw-rw-r-- profile.sky
+
+    $ chmod +x profile.sky &amp;&amp; ./profile.sky
+
+    $ stat -c "%A %n" *
+    -rw-rw-r-- interview.txt
+    -rw-rw-r-- interview.csv
+    -rwxrwxr-x profile.sky</pre>
+                    <p>By default profiles are not executables, thus the need to <u class="tty">chmod +x</u> before running it. Opening the CSV file should contain two columns, one for each classified entity.</p>
+                    <div id="output1" class="output">
+                        <div class="profile-header">
+                            <b></b>
+                            <i></i>
+                            Skyle Output
+                        </div>
+                        <table>
+                            <tr>
+                                <td data-table="header"></td>
+                                <td data-table="header" width="48%">A</td>
+                                <td data-table="header" width="48%">B</td>
+                            </tr>
+                            <tr>
+                                <td data-table="header">1</td>
+                                <td class="active">question</td>
+                                <td>answer</td>
+                            </tr>
+                            <tr>
+                                <td data-table="header">2</td>
+                                <td>What's your name?</td>
+                                <td>Skyle.</td>
+                            </tr>
+                            <tr>
+                                <td data-table="header">3</td>
+                                <td>How are you?</td>
+                                <td>I'm fine, thanks.</td>
+                            </tr>
+                            <tr>
+                                <td data-table="header">4</td>
+                                <td>What do you think of this interview?</td>
+                                <td>It's nice!</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <p>&nbsp;</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xl-8 offset-xl-2 col-lg-10 offset-lg-1 col-md-12">
+                    <p>Scraping XML/HTML documents is not very different than text files. Just adapt the profile with the corresponding <kbd data-def="Evaluates an XPath expression" data-usage="follow XPATH">follow</kbd> instruction and most of the work is done.</p>
+                    <p>Behind the curtains, XML/HTML documents create an in-memory copy of the root node(s). Instructions such as <kbd data-def="Change the ROOT node" data-usage="node XPATH">node</kbd> and <kbd data-def="Loop last declared node" data-usage="next node">next</kbd> are used to control this component. <strong>Skyle</strong>'s internal stack is not affected since this component has an auxiliary role in the process of scraping.</p>
+                    <pre class="terminal">
+    $ ls
+    document.html
+
+    $ cat document.html
+    &lt;html&gt;
+        &lt;head&gt;
+            &lt;title&gt;HTML Example&lt;/title&gt;
+        &lt;/head&gt;
+        &lt;body&gt;
+            &lt;div&gt;
+                &lt;h2&gt;An article&lt;/h2&gt;
+                &lt;span&gt;633 views&lt;/span&gt;
+                &lt;p&gt;Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.&lt;/p&gt;
+            &lt;/div&gt;
+            &lt;div&gt;
+                &lt;h2&gt;Anoter article&lt;/h2&gt;
+                &lt;span&gt;542 views&lt;/span&gt;
+                &lt;p&gt;Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.&lt;/p&gt;
+            &lt;/div&gt;
+            &lt;div&gt;
+                &lt;h2&gt;Yet again an article&lt;/h2&gt;
+                &lt;span&gt;62 views&lt;/span&gt;
+                &lt;p&gt;Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.&lt;/p&gt;
+            &lt;/div&gt;
+            &lt;div&gt;
+                &lt;h2&gt;Still an article&lt;/h2&gt;
+                &lt;a href="article.pdf"&gt;Download article&lt;/a&gt;
+            &lt;/div&gt;
+            &lt;div&gt;
+                &lt;h2&gt;Last article&lt;/h2&gt;
+                &lt;span&gt;321 views&lt;/span&gt;
+            &lt;/div&gt;
+        &lt;/body&gt;
+    &lt;/html&gt;</pre>
+                    <p>It's worth mentioning that not all <u class="tty">div</u> tags contain the same structure, therefore a simple use of <kbd data-def="Evaluates an XPath expression" data-usage="follow XPATH">follow</kbd> will generate unsynchronized results. The solution is to use the <kbd data-def="Change the ROOT node" data-usage="node XPATH">node</kbd> instruction to change the root node from the default <u class="tty">html</u> tag to <u class="tty">div</u> tag. With the help of <kbd data-def="Loop last declared node" data-usage="next node">next</kbd> instruction, <strong>Skyle</strong> can loop all nodes, resulting in a synchronized <kbd data-def="Provide the file path for output file" data-usage="output FILENAME">output</kbd>, as expected.</p>
+                    <div id="case2" class="case">
+                        <div class="profile-header">
+                            <b></b>
+                            <i></i>
+                            Skyle profile
+                        </div>
+                        <ol class="skyle">
+                            <li><span class="comment">#!/usr/bin/skyle</span></li>
+                            <li></li>
+                            <li><span class="comment"># a name for the profile to recognize it later</span></li>
+                            <li><span class="headers">title <i>HTML Example</i></span></li>
+                            <li></li>
+                            <li><span class="comment"># provide path to HTML probe</span></li>
+                            <li><span class="headers">probe <i>document.html</i></span></li>
+                            <li></li>
+                            <li><span class="comment"># provide path to output</span></li>
+                            <li><span class="headers">output <i>htmldoc.csv</i></span></li>
+                            <li></li>
+                            <li><span class="comment"># change root node from "html" to "div"</span></li>
+                            <li><span class="functions">node <i class="node">//div</i></span></li>
+                            <li></li>
+                            <li><span class="comment"># get relative "h2" text content, save and continue</span></li>
+                            <li><span class="functions">follow <i class="follow">./h2/text()</i></span></li>
+                            <li><span class="functions">save <i class="save">title</i></span></li>
+                            <li></li>
+                            <li><span class="comment"># get relative "span" text content, remove whatever</span></li>
+                            <li><span class="comment"># is not a digit, save and continue</span></li>
+                            <li><span class="functions">follow <i class="follow">./span/text()</i></span></li>
+                            <li><span class="functions">remove <i class="remove">\D</i></span></li>
+                            <li><span class="functions">save <i class="save">views</i></span></li>
+                            <li></li>
+                            <li><span class="comment"># get relative "p" text content, save and continue</span></li>
+                            <li><span class="functions">follow <i class="follow">./p/text()</i></span></li>
+                            <li><span class="functions">save <i class="save">content</i></span></li>
+                            <li></li>
+                            <li><span class="comment"># get relative "a" href attribute, save and continue</span></li>
+                            <li><span class="functions">follow <i class="follow">./a/@href</i></span></li>
+                            <li><span class="functions">save <i class="save">file</i></span></li>
+                            <li></li>
+                            <li><span class="comment"># continue loop until no next root node exists</span></li>
+                            <li><span class="functions">next <i class="next">node</i></span></li>
+                            <li></li>
+                            <li><span class="comment"># download all files</span></li>
+                            <li><span class="functions">exec <i class="exec">wget $file</i></span></li>
+                            <li></li>
+                        </ol>
+                    </div>
+                    <p>The <u class="tty">span</u> tag has a pattern of <u class="tty">DIGIT views</u>. The use of <kbd data-def="Removes recursive regular expression" data-usage="remove REGEXP">remove</kbd> instead of <kbd data-def="Evaluates a regular expression" data-usage="pattern REGEXP">pattern</kbd> is simply a choice of preference. Both would have worked.</p>
+                    <p>It's the first time a variable is being used in a <strong>Skyle</strong> profile: <u class="tty">$file</u>. The dollar sign in front of a alphanumeric word invokes a classified entity, if it exists.</p>
+                    <p>Notice the <kbd data-def="Launches a shell command" data-usage="exec SHELL">exec</kbd> instruction is out of the node-loop. Variables are lists, therefore any instruction calling upon a saved entity acts as a loop for each element of the list. This would translate as a loop inside a loop, thus the reason <kbd data-def="Launches a shell command" data-usage="exec SHELL">exec</kbd> is being called outside of the node-loop</p>
+                    <div id="output2" class="output">
+                        <div class="profile-header">
+                            <b></b>
+                            <i></i>
+                            Skyle Output
+                        </div>
+                        <table>
+                            <tr>
+                                <td data-table="header"></td>
+                                <td data-table="header" width="34%">A</td>
+                                <td data-table="header" width="14%">B</td>
+                                <td data-table="header" width="24%">C</td>
+                                <td data-table="header" width="24%">D</td>
+                            </tr>
+                            <tr>
+                                <td data-table="header">1</td>
+                                <td>title</td>
+                                <td>views</td>
+                                <td>content</td>
+                                <td>file</td>
+                            </tr>
+                            <tr>
+                                <td data-table="header">2</td>
+                                <td>An article</td>
+                                <td>633</td>
+                                <td>Lorem ipsum...</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td data-table="header">3</td>
+                                <td>Anoter article</td>
+                                <td>542</td>
+                                <td>Ut enim...</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td data-table="header">4</td>
+                                <td>Yet again an article</td>
+                                <td>62</td>
+                                <td>Duis aute...</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td data-table="header">5</td>
+                                <td>Still an article</td>
+                                <td></td>
+                                <td></td>
+                                <td class="active">article.pdf</td>
+                            </tr>
+                            <tr>
+                                <td data-table="header">6</td>
+                                <td>Last article</td>
+                                <td>321</td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container main">
+            <div class="row">
+                <div class="col-xl-8 offset-xl-2 col-lg-10 offset-lg-1 col-md-12">
+                    <div class="github">
+                        <p>
+                            <small>A complete reference to <strong>Skyle</strong>'s documentation can be found on <a href="https://github.com/lexndru/skyle" title="Skyle GitHub">GitHub</a></small>
+                        </p>
+                        <p>
+                            <a class="github-button" href="https://github.com/lexndru/skyle/subscription" data-icon="octicon-eye" data-size="large" data-show-count="true" aria-label="Watch lexndru/skyle on GitHub">Watch</a>
+                            <a class="github-button" href="https://github.com/lexndru/skyle" data-icon="octicon-star" data-size="large" data-show-count="true" aria-label="Star lexndru/skyle on GitHub">Star</a>
+                            <a class="github-button" href="https://github.com/lexndru/skyle/fork" data-icon="octicon-repo-forked" data-size="large" data-show-count="true" aria-label="Fork lexndru/skyle on GitHub">Fork</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xl-8 offset-xl-2 col-lg-10 offset-lg-1 col-md-12">
+                    <div id="footer" class="terminal">
+                        <div class="profile-header">
+                            <b></b>
+                            <i></i>
+                            terminal
+                        </div>
+                        <pre>
+    $ cd /tmp/profiles
+    $ skyle
+         _          _
+     ___| | ___   _| | ___
+    / __| |/ / | | | |/ _ \
+    \__ \   <| |_| | |  __/
+    |___/_|\_\\__, |_|\___|
+              |___/
+
+    Version: 0.0.9alpha
+      Build: b70f077023070a279d7b0dbc6af2e264c02833a5
+    OS/Arch: Linux/x86_64</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="support" class="support">
+            <article>
+                <h2>Support Skyle.</h2>
+                <p>Spread the word over the internet!</p>
+                <p><a class="github-button" href="https://github.com/lexndru" data-size="large" aria-label="Follow @lexndru on GitHub">Follow @lexndru</a></p>
+                <p><i class="fas fa-angle-double-up"></i></p>
+                <p>scroll to go back</p>
+            </article>
+        </div>
+        <script async defer src="https://buttons.github.io/buttons.js"></script>
+        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha256-k2WSCIexGzOj3Euiig+TlR8gA0EmPjuc79OEeY5L45g=" crossorigin="anonymous"></script>
+        <script type="text/javascript">
+        $(document).ready(function () {
+
+            /*
+             * Support Skyle
+             */
+            $(window).scroll(function (e) {
+                var top = $(window).scrollTop(),
+                    all = $(document).height(),
+                    win = $(window).height(),
+                    perc = (top / (all - win)) * 100;
+                if (perc > 98) {
+                    $('#footer').addClass('fullscreen');
+                    $('#support').show().addClass('show');
+                    $('#support article').css('margin-top', $(window).height()/2.3);
+                } else if ($('#footer').hasClass('fullscreen')) {
+                    setTimeout(function () {
+                        $('#support').hide().removeClass('show');
+                        $('#support').removeClass('hide');
+                    }, 490);
+                    $('#support').addClass('hide');
+                    $('#footer').removeClass('fullscreen');
+                }
+            });
+
+            /*
+             * Show a cool definition for each Skyle keyword
+             */
+             $(window).click(function (e) {
+                 $('aside').remove();
+                 $('.container').removeClass('blur');
+             });
+            $('kbd').click(function (e) {
+                e.stopPropagation();
+                if ($('.container').hasClass('blur')) {
+                    return;
+                }
+                var ctx = ''
+                    + '<aside>'
+                    + '<i>' + $(this).attr('data-usage') + '</i>'
+                    + '<b>' + $(this).attr('data-def') + '</b>'
+                    + '</aside>';
+                $('body').append(ctx);
+                $('aside').css('top', $(this).offset().top - $(this).height() + 'px');
+                $('aside').css('left', $(this).offset().left - $(this).width() + 'px');
+                // $(this).attr('data-usage')
+                $('.container').addClass('blur');
+            });
+
+            /*
+             * Swing Skyle profile from headers to instructions
+             */
+            $('[data-profile]').hover(function (e) {
+                var cls = $(this).attr('data-profile');
+                $('#profile').removeClass().addClass(cls);
+                $('[data-profile] p').removeClass('active');
+                var ph = $(this).find('p');
+                if (!ph.hasClass('active')) {
+                    ph.addClass('active');
+                }
+            });
+
+            /*
+             * Animations and visual improvements on profile tutorial
+             */
+            $('#dummy').on('mouseover', function (e) {
+                $('#stack p').text('');
+                var elem = e.relatedTarget;
+                if (elem != null) {
+                    var mem = elem.dataset.memory,
+                        txt = elem.dataset.stack,
+                        top = elem.getBoundingClientRect().top - $(this)[0].getBoundingClientRect().top - 20;
+                    if (top <= 0) {
+                        return;
+                    }
+                    $('#stack').css('top', top + 'px');
+                    $('#stack p').text(txt);
+                    $('#dummy li').removeClass('active');
+                    $(elem).addClass('active');
+                    $('#stack li').removeClass();
+                    for (var i = 0; i < parseInt(mem); i++) {
+                        var li = $('#stack li')[i];
+                        if (li == undefined) {
+                            continue;
+                        }
+                        $(li).addClass('active');
+                        if (elem.dataset.save !== undefined) {
+                            $(li).addClass('disabled');
+                        }
+                    }
+                }
+            });
+        });
+        </script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-112411055-1"></script>
+        <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','UA-112411055-1');</script>
+    </body>
+</html>
